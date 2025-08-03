@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-blue-100 bg-opacity-80 backdrop-blur-md p-6 rounded-lg shadow-lg mt-8 transition duration-300 hover:shadow-2xl hover:scale-105 transform">
+    <h2 class="text-2xl font-bold mb-4 text-center text-blue-900">Register</h2>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div>
+            <label for="{{ form.id_number.id_for_label }}" class="block text-sm font-medium text-gray-800">ID Number</label>
+            <input type="text" name="{{ form.id_number.name }}" id="{{ form.id_number.id_for_label }}"
+                   placeholder="Enter your 13-digit ID number"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md"
+                   required>
+            {% if form.id_number.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.id_number.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-800">First Name</label>
+            <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
+                   placeholder="Enter your first name"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md"
+                   required>
+            {% if form.first_name.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.first_name.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-800">Last Name</label>
+            <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
+                   placeholder="Enter your last name"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md"
+                   required>
+            {% if form.last_name.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.last_name.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-800">Email</label>
+            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"
+                   placeholder="Enter your email"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md">
+            {% if form.email.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.email.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-800">Phone Number</label>
+            <input type="text" name="{{ form.phone_number.name }}" id="{{ form.phone_number.id_for_label }}"
+                   placeholder="Enter your phone number"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md">
+            {% if form.phone_number.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.phone_number.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.address.id_for_label }}" class="block text-sm font-medium text-gray-800">Address</label>
+            <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}"
+                      placeholder="Enter your address"
+                      class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                             transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md"></textarea>
+            {% if form.address.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.address.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-800">Password</label>
+            <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}"
+                   placeholder="Enter your password"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md"
+                   required>
+            {% if form.password.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.password.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.confirm_password.id_for_label }}" class="block text-sm font-medium text-gray-800">Confirm Password</label>
+            <input type="password" name="{{ form.confirm_password.name }}" id="{{ form.confirm_password.id_for_label }}"
+                   placeholder="Confirm your password"
+                   class="mt-1 block w-full p-2 border border-blue-200 rounded-md
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                          transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-md"
+                   required>
+            {% if form.confirm_password.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.confirm_password.errors }}</p>
+            {% endif %}
+        </div>
+
+        <div class="flex justify-center mt-6">
+            <button type="submit"
+                    class="px-6 py-2 rounded text-white text-sm
+                           bg-blue-500 bg-opacity-70 backdrop-blur-md
+                           hover:bg-blue-600 hover:bg-opacity-90
+                           shadow-md hover:shadow-xl
+                           transition duration-300 ease-in-out transform hover:scale-105
+                           focus:outline-none focus:ring-2 focus:ring-blue-300">
+                Register
+            </button>
+        </div>
+    </form>
+
+    <p class="mt-4 text-center text-gray-700">
+        Already have an account?
+        <a href="{% url 'login' %}" class="text-blue-700 hover:underline">Login</a>
+    </p>
+</div>
+<div class="h-24"></div>
+{% endblock %}

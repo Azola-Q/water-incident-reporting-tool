@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-blue-100 bg-opacity-80 backdrop-blur-md p-6 rounded-lg shadow-lg mt-8 transition duration-300 hover:shadow-2xl hover:scale-105 transform">
+    <h2 class="text-2xl font-bold mb-6 text-center text-blue-800">Report an Incident</h2>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Incident Type</label>
+            {{ form.issue_type }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Incident Description</label>
+            {{ form.description }}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Upload Image (Optional)</label>
+            <input type="file" name="image" accept="image/*" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+        </div>
+
+        <!-- Hidden latitude and longitude fields -->
+        <input type="hidden" id="id_latitude" name="latitude">
+        <input type="hidden" id="id_longitude" name="longitude">
+
+        <!-- Map container -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Click on the map to select location</label>
+            <div id="map" style="height: 300px; margin-top: 10px; border-radius: 8px;"></div>
+        </div>
+
+        <div class="flex justify-center mt-6">
+         <button type="submit"
+    class="bg-blue-500 bg-opacity-70 backdrop-blur-md text-white
+           px-6 py-2 text-sm rounded
+           hover:bg-blue-600 hover:bg-opacity-90
+           shadow-md hover:shadow-xl
+           transition duration-300 ease-in-out transform hover:scale-105
+           focus:outline-none focus:ring-2 focus:ring-blue-300">
+    Submit Incident
+</button>
+
+        </div>
+    </form>
+</div>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Map Script -->
+<script>
+    const map = L.map('map').setView([-33.918861, 18.423300], 12); // Default to Cape Town
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker;
+
+    map.on('click', function (e) {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        document.getElementById('id_latitude').value = lat;
+        document.getElementById('id_longitude').value = lng;
+    });
+</script>
+<div class="h-24"></div>
+{% endblock %}

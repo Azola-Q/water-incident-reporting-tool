@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Status{% endblock %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto bg-blue-100 bg-opacity-80 backdrop-blur-md p-6 rounded-lg shadow-lg mt-8 transition duration-300 hover:shadow-2xl hover:scale-105 transform">
+
+    <h2 class="text-2xl font-bold mb-6 text-blue-900 text-center">Incident Status</h2>
+
+    <!-- FILTER FORM -->
+    <form method="get" class="flex flex-wrap justify-center items-end gap-4 text-sm mb-6">
+        <!-- Issue Type Filter -->
+        <div class="w-48">
+            <label for="issue_type" class="block font-medium text-gray-700 mb-1">Incident Type</label>
+            <select name="issue_type" id="issue_type" class="w-full rounded border-gray-300 hover:shadow-2xl hover:scale-105 transform"
+                onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="pipe_damage" {% if request.GET.issue_type == 'pipe_damage' %}selected{% endif %}>Pipe Damage</option>
+                <option value="tap_failure" {% if request.GET.issue_type == 'tap_failure' %}selected{% endif %}>Tap Failure</option>
+                <option value="tank_empty" {% if request.GET.issue_type == 'tank_empty' %}selected{% endif %}>Tank Empty</option>
+                <option value="illegal_connection" {% if request.GET.issue_type == 'illegal_connection' %}selected{% endif %}>Illegal Connection</option>
+                <option value="water_leak" {% if request.GET.issue_type == 'water_leak' %}selected{% endif %}>Water Leak</option>
+                <option value="no_water_supply" {% if request.GET.issue_type == 'no_water_supply' %}selected{% endif %}>No Water Supply</option>
+                <option value="contaminated_water" {% if request.GET.issue_type == 'contaminated_water' %}selected{% endif %}>Contaminated Water</option>
+                <option value="broken_meter" {% if request.GET.issue_type == 'broken_meter' %}selected{% endif %}>Broken Water Meter</option>
+                <option value="low_pressure" {% if request.GET.issue_type == 'low_pressure' %}selected{% endif %}>Low Water Pressure</option>
+                <option value="unauthorized_use" {% if request.GET.issue_type == 'unauthorized_use' %}selected{% endif %}>Unauthorized Water Use</option>
+                <option value="sewage_overflow" {% if request.GET.issue_type == 'sewage_overflow' %}selected{% endif %}>Sewage Overflow</option>
+                <option value="other" {% if request.GET.issue_type == 'other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="w-40">
+            <label for="status" class="block font-medium text-gray-700 mb-1">Status</label>
+            <select name="status" id="status" class="w-full rounded border-gray-300 hover:shadow-2xl hover:scale-105 transform"
+                onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="received" {% if request.GET.status == 'received' %}selected{% endif %}>Received</option>
+                <option value="processing" {% if request.GET.status == 'processing' %}selected{% endif %}>Processing</option>
+                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+
+        <!-- Export Button -->
+        <div>
+  <label class="invisible">Export</label>
+  <a href="?{% if request.GET.issue_type %}issue_type={{ request.GET.issue_type }}&{% endif %}
+            {% if request.GET.status %}status={{ request.GET.status }}&{% endif %}export=pdf"
+     class="bg-green-600 bg-opacity-80 backdrop-blur-md text-white text-center py-2 px-4 rounded 
+            shadow-md transition duration-300 ease-in-out transform hover:scale-110 hover:shadow-xl
+            hover:bg-green-700 hover:bg-opacity-90 animate-breathing">
+    Export PDF
+  </a>
+</div>
+
+    </form>
+
+    {% if issues %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-sm rounded text-sm text-left">
+                <thead>
+                    <tr class="bg-blue-200 text-blue-800 font-semibold">
+                        <th class="px-3 py-2 border-b ">Incident Type</th>
+                        <th class="px-3 py-2 border-b ">Description</th>
+                        <th class="px-3 py-2 border-b text-center">Image</th>
+                        <th class="px-3 py-2 border-b ">Location</th>
+                        <th class="px-3 py-2 border-b ">Status</th>
+                        <th class="px-3 py-2 border-b">Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in issues %}
+                        <tr class="hover:bg-blue-50">
+                            <td class="px-3 py-2 border-b ">{{ issue.get_issue_type_display }}</td>
+                            <td class="px-3 py-2 border-b max-w-xs text-left whitespace-normal break-words leading-5">
+                                {{ issue.description }}
+                            </td>
+                            <td class="px-3 py-2 border-b">
+                                {% if issue.image %}
+                                    <img src="{{ issue.image.url }}" alt="Uploaded Image" class="w-20 h-20 object-cover rounded border mx-auto" />
+                                {% else %}
+                                    <span class="text-gray-500 italic">No image</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-3 py-2 border-b">
+                                {% if issue.latitude and issue.longitude %}
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ issue.latitude }},{{ issue.longitude }}"
+                                       target="_blank" class="text-blue-600 underline">
+                                        View Map
+                                    </a><br>
+                                    <span class="text-gray-600 text-xs">{{ issue.latitude }}, {{ issue.longitude }}</span>
+                                {% else %}
+                                    <span class="text-gray-500 italic">Not provided</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-3 py-2 border-b">{{ issue.get_status_display }}</td>
+                            <td class="px-3 py-2 border-b">{{ issue.created_at|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center text-gray-700">No Incident Reported yet.</p>
+    {% endif %}
+</div>
+
+<div class="h-24"></div>
+{% endblock %}
