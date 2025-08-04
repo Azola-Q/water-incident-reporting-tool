@@ -12,3 +12,5 @@ services:
         generateValue: true
       - key: DEBUG
         value: False
+    postDeployScript: |
+      python manage.py migrate
