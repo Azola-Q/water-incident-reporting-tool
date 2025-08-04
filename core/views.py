@@ -25,7 +25,11 @@ def login_view(request):
     if request.method == 'POST':
         id_number = request.POST.get('id_number')
         password = request.POST.get('password')
-        user = authenticate(request, username=id_number, password=password)
+        try:
+            user_obj = User.objects.get(id_number=id_number)
+            user = authenticate(request, username=user_obj.username, password=password)
+        except User.DoesNotExist:
+            user = None
 
         if user is not None:
             login(request, user)
@@ -34,7 +38,7 @@ def login_view(request):
             return redirect('home')
         else:
             messages.error(request, 'Invalid ID number or password.')
-    
+
     return render(request, 'login.html')
 
 
@@ -88,7 +92,6 @@ def edit_details_view(request):
 
 @login_required
 def status_view(request):
-    # Handle filters
     export = None
     for key in request.GET.keys():
         if key.strip() == 'export':
@@ -107,7 +110,6 @@ def status_view(request):
         issues = issues.filter(status=status_filter)
 
     if export == 'pdf':
-        # Generate PDF response
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="complaints.pdf"'
 
@@ -127,7 +129,7 @@ def status_view(request):
         elements.append(Spacer(1, 12))
 
         data = [['Issue Type', 'Description', 'Status', 'Created At', 'Latitude', 'Longitude']]
-        col_widths = [3.2*cm, 6.5*cm, 2.3*cm, 3.2*cm, 1.7*cm, 1.7*cm]
+        col_widths = [3.2 * cm, 6.5 * cm, 2.3 * cm, 3.2 * cm, 1.7 * cm, 1.7 * cm]
 
         for issue in issues:
             data.append([
