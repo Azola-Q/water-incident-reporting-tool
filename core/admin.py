@@ -3,11 +3,10 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import mark_safe, format_html
 from .models import User, Issue
 
-
 class CustomUserAdmin(UserAdmin):
     model = User
-    list_display = ['id_number', 'first_name', 'last_name', 'email', 'phone_number', 'is_admin', 'is_active']
-    list_filter = ['is_admin', 'is_active']
+    list_display = ['id_number', 'first_name', 'last_name', 'email', 'phone_number', 'show_is_admin', 'is_active']
+    list_filter = ['is_staff', 'is_superuser', 'is_active']
     fieldsets = (
         (None, {'fields': ('id_number', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone_number', 'address')}),
@@ -23,6 +22,10 @@ class CustomUserAdmin(UserAdmin):
     ordering = ['id_number']
     filter_horizontal = ('groups', 'user_permissions')
 
+    def show_is_admin(self, obj):
+        return obj.is_admin
+    show_is_admin.boolean = True
+    show_is_admin.short_description = 'Is Admin'
 
 class IssueAdmin(admin.ModelAdmin):
     list_display = [
@@ -92,14 +95,12 @@ class IssueAdmin(admin.ModelAdmin):
             if lat == 0 and lon == 0:
                 return "Invalid location"
             return format_html(
-            '<a href="https://maps.google.com/?q={},{}" target="_blank">📍 Lat: {:.5f}, Long: {:.5f}</a>',
-            lat, lon, lat, lon
+                '<a href="https://maps.google.com/?q={},{}" target="_blank">📍 Lat: {:.5f}, Long: {:.5f}</a>',
+                lat, lon, lat, lon
             )
         except (ValueError, TypeError):
             return "No location selected"
     location_display.short_description = 'Location'
-
-
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Issue, IssueAdmin)
