@@ -8,23 +8,27 @@ class User(AbstractUser):
     address = models.TextField(blank=True)
     is_admin = models.BooleanField(default=False)
 
+    # ✅ Use ID number for login
+    USERNAME_FIELD = 'id_number'
+    REQUIRED_FIELDS = ['username', 'email']
+
     groups = models.ManyToManyField(
         Group,
-        related_name='core_user_set',  # changed from default to avoid clash
+        related_name='core_user_set',  # avoid clash
         blank=True,
         help_text='The groups this user belongs to.',
         verbose_name='groups',
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='core_user_set',  # changed from default to avoid clash
+        related_name='core_user_set',  # avoid clash
         blank=True,
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
 
     def __str__(self):
-        return self.username
+        return self.id_number
 
 
 class Issue(models.Model):
