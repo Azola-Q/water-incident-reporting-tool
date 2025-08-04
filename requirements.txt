@@ -4,3 +4,4 @@ whitenoise
 dj-database-url
 psycopg2-binary
 twilio==9.3.0
+Pillow
