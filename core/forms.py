@@ -65,6 +65,13 @@ class UserRegisterForm(forms.ModelForm):
         if password and confirm and password != confirm:
             raise ValidationError("Passwords do not match.")
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])  # ✅ hash password
+        if commit:
+            user.save()
+        return user
+
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:
