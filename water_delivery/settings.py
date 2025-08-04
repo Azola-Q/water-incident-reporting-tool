@@ -32,6 +32,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ✅ Root URL Configuration
+ROOT_URLCONF = 'water_delivery.urls'
+
 # Templates configuration (needed for admin and rendering)
 TEMPLATES = [
     {
