@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
 class User(AbstractUser):
     id_number = models.CharField(max_length=13, unique=True)
@@ -7,6 +7,21 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=10, blank=True)
     address = models.TextField(blank=True)
     is_admin = models.BooleanField(default=False)
+
+    groups = models.ManyToManyField(
+        Group,
+        related_name='core_user_set',  # changed from default to avoid clash
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='core_user_set',  # changed from default to avoid clash
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
 
     def __str__(self):
         return self.username
@@ -46,12 +61,11 @@ class Issue(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='issue_images/', blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='received')
-    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, default='moderate')  # New field
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, default='moderate')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     admins = models.ManyToManyField(User, related_name='assigned_issues', blank=True)
 
-    # Exact location
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 
