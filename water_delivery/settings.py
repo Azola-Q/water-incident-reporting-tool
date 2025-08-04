@@ -11,7 +11,13 @@ ALLOWED_HOSTS = ['.onrender.com', 'localhost']
 
 # ✅ Apps
 INSTALLED_APPS = [
-    ...
+   'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    '>>>>>>>>',
 ]
 
 # ✅ Middleware with WhiteNoise
@@ -43,5 +49,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_gmail_address@gmail.com'
+EMAIL_HOST_USER = 'azolaqakaqu@gmail.com'
 EMAIL_HOST_PASSWORD = 'your_app_password'
