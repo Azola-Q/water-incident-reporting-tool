@@ -1,31 +1,39 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-class User(AbstractUser):
+class CustomUserManager(BaseUserManager):
+    def create_user(self, id_number, password=None, **extra_fields):
+        if not id_number:
+            raise ValueError('The ID number must be set')
+        user = self.model(id_number=id_number, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, id_number, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        return self.create_user(id_number, password, **extra_fields)
+
+class User(AbstractBaseUser, PermissionsMixin):
     id_number = models.CharField(max_length=13, unique=True)
-    login_status = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)
     phone_number = models.CharField(max_length=10, blank=True)
     address = models.TextField(blank=True)
-    is_admin = models.BooleanField(default=False)
 
-    # ✅ Use ID number for login
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    objects = CustomUserManager()
+
     USERNAME_FIELD = 'id_number'
-    REQUIRED_FIELDS = ['username', 'email']
-
-    groups = models.ManyToManyField(
-        Group,
-        related_name='core_user_set',  # avoid clash
-        blank=True,
-        help_text='The groups this user belongs to.',
-        verbose_name='groups',
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='core_user_set',  # avoid clash
-        blank=True,
-        help_text='Specific permissions for this user.',
-        verbose_name='user permissions',
-    )
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.id_number
@@ -74,4 +82,4 @@ class Issue(models.Model):
     longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.issue_type} - {self.user.username}"
+        return f"{self.issue_type} - {self.id_number if hasattr(self, 'id_number') else self.user.id_number}"
