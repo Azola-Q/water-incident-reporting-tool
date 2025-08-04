@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-import dj_database_url  # 👈 make sure you installed this
+import dj_database_url  # ✅ Ensure installed
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,9 +9,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-default')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['.onrender.com', 'localhost']
 
+# ✅ Security for session and CSRF cookies
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 # ✅ Apps
 INSTALLED_APPS = [
-   'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -35,16 +39,16 @@ MIDDLEWARE = [
 # ✅ Root URL Configuration
 ROOT_URLCONF = 'water_delivery.urls'
 
-# Templates configuration (needed for admin and rendering)
+# ✅ Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # add if you have a templates folder
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',  # important for admin
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -52,8 +56,10 @@ TEMPLATES = [
     },
 ]
 
+# ✅ WSGI application
+WSGI_APPLICATION = 'water_delivery.wsgi.application'
 
-# ✅ Database with fallback to SQLite
+# ✅ Database (fallback to SQLite, use PostgreSQL via env DATABASE_URL)
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
@@ -66,14 +72,17 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ✅ Media files (you already had this)
+# ✅ Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# ✅ Email (unchanged)
+# ✅ Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'azolaqakaqu@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password'
+EMAIL_HOST_PASSWORD = 'your_app_password'  # Replace with your actual app password
+
+# ✅ Auto field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
