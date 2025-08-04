@@ -86,3 +86,12 @@ EMAIL_HOST_PASSWORD = 'your_app_password'  # Replace with your actual app passwo
 
 # ✅ Auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# === Custom User Model ===
+AUTH_USER_MODEL = 'core.User'  # Point to your custom user model
+
+# === Authentication Backends ===
+AUTHENTICATION_BACKENDS = [
+    'core.backends.IDNumberAuthBackend',  # Your custom backend (make sure backends.py exists)
+    'django.contrib.auth.backends.ModelBackend',  # Django default
+]
