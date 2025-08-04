@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class IDNumberBackend(ModelBackend):
+class IDNumberAuthBackend(ModelBackend):
     """
     Custom authentication backend that allows users to log in using their
     ID number (stored in the 'id_number' field) instead of username.
@@ -18,4 +18,3 @@ class IDNumberBackend(ModelBackend):
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
         return None
-
