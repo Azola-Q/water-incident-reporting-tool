@@ -25,11 +25,7 @@ def login_view(request):
     if request.method == 'POST':
         id_number = request.POST.get('id_number')
         password = request.POST.get('password')
-        try:
-            user_obj = User.objects.get(id_number=id_number)
-            user = authenticate(request, username=user_obj.username, password=password)
-        except User.DoesNotExist:
-            user = None
+        user = authenticate(request, id_number=id_number, password=password)
 
         if user is not None:
             login(request, user)
@@ -41,12 +37,12 @@ def login_view(request):
 
     return render(request, 'login.html')
 
+
 def register_view(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.id_number
             user.set_password(form.cleaned_data['password'])
             user.save()
             messages.success(request, 'Registration successful. Please login.')
