@@ -8,10 +8,9 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Choose a unique identifier for checking if the user already exists
+# Prevent duplicate superuser creation
 if not User.objects.filter(id_number="0000000000000").exists():
     User.objects.create_superuser(
-        username="admin",  # <-- FIXED: Required field!
         id_number="0000000000000",
         email="admin@example.com",
         password="adminpassword123",
