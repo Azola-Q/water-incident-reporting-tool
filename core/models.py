@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, id_number, password=None, **extra_fields):
         if not id_number:
@@ -13,11 +14,14 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, id_number, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        if extra_fields.get('is_staff') is not True:
+
+        if not extra_fields.get('is_staff'):
             raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
+        if not extra_fields.get('is_superuser'):
             raise ValueError('Superuser must have is_superuser=True.')
+
         return self.create_user(id_number, password, **extra_fields)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     id_number = models.CharField(max_length=13, unique=True)
@@ -82,4 +86,4 @@ class Issue(models.Model):
     longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.issue_type} - {self.id_number if hasattr(self, 'id_number') else self.user.id_number}"
+        return f"{self.issue_type} - {self.user.id_number}"
