@@ -53,10 +53,10 @@ class UserRegisterForm(forms.ModelForm):
         return last_name
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise ValidationError("This email is already registered.")
-        return email
+    email = self.cleaned_data.get('email')
+    if email and User.objects.filter(email=email).exists():
+        raise ValidationError("This email is already registered.")
+    return email
 
     def clean(self):
         cleaned_data = super().clean()
