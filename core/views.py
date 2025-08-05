@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from django.http import HttpResponse
 
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+ssl._create_default_https_context = ssl._create_unverified_context  # For local email testing
 
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
@@ -25,6 +25,7 @@ def login_view(request):
     if request.method == 'POST':
         id_number = request.POST.get('id_number')
         password = request.POST.get('password')
+        # Authenticate using custom backend that expects id_number
         user = authenticate(request, id_number=id_number, password=password)
 
         if user is not None:
@@ -42,8 +43,9 @@ def register_view(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.id_number  # Optional: needed only if username is used somewhere
-            user.save()  # password already hashed by form.save()
+            # Optional: sync username to id_number if you use username elsewhere
+            user.username = user.id_number
+            user.save()  # Password is hashed inside form.save()
             messages.success(request, 'Registration successful. Please login.')
             return redirect('login')
     else:
@@ -62,7 +64,6 @@ def home_view(request):
             issue = form.save(commit=False)
             issue.user = request.user
             issue.save()
-
             messages.success(request, 'Your complaint has been received. Our team will process it shortly.')
             return redirect('status')
     else:
@@ -150,9 +151,11 @@ def forgot_password_view(request):
             id_number = form.cleaned_data['id_number']
             try:
                 user = User.objects.get(id_number=id_number)
+                # Generate a separate token and save it to a dedicated field (you'll need to add this field to User model)
                 token = get_random_string(32)
-                user.set_password(token)
+                user.password_reset_token = token
                 user.save()
+
                 reset_url = request.build_absolute_uri(reverse('reset_password', kwargs={'token': token}))
                 send_mail(
                     subject='Password Reset Request',
@@ -171,17 +174,20 @@ def forgot_password_view(request):
 
 
 def reset_password_view(request, token):
+    try:
+        user = User.objects.get(password_reset_token=token)
+    except User.DoesNotExist:
+        messages.error(request, 'Invalid or expired reset link.')
+        return redirect('forgot_password')
+
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():
-            try:
-                user = User.objects.get(password=token)
-                user.set_password(form.cleaned_data['password'])
-                user.save()
-                messages.success(request, 'Password reset successfully. Please login.')
-                return redirect('login')
-            except User.DoesNotExist:
-                messages.error(request, 'Invalid or expired reset link.')
+            user.set_password(form.cleaned_data['password'])
+            user.password_reset_token = ''  # Clear token
+            user.save()
+            messages.success(request, 'Password reset successfully. Please login.')
+            return redirect('login')
     else:
         form = PasswordResetForm()
     return render(request, 'reset_password.html', {'form': form})
