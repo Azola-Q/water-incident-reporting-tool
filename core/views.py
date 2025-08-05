@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from django.http import HttpResponse
 
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_context  # SSL bypass for local email
+ssl._create_default_https_context = ssl._create_unverified_context
 
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
@@ -34,7 +34,6 @@ def login_view(request):
             return redirect('home')
         else:
             messages.error(request, 'Invalid ID number or password.')
-
     return render(request, 'login.html')
 
 
@@ -43,8 +42,8 @@ def register_view(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
+            user.username = user.id_number  # Optional: needed only if username is used somewhere
+            user.save()  # password already hashed by form.save()
             messages.success(request, 'Registration successful. Please login.')
             return redirect('login')
     else:
@@ -87,20 +86,13 @@ def edit_details_view(request):
 
 @login_required
 def status_view(request):
-    export = None
-    for key in request.GET.keys():
-        if key.strip() == 'export':
-            export = request.GET.get(key).strip() if request.GET.get(key) else ''
-            break
-
+    export = request.GET.get('export', '').strip()
     issue_type = request.GET.get('issue_type', '').strip()
     status_filter = request.GET.get('status', '').strip()
 
     issues = Issue.objects.filter(user=request.user)
-
     if issue_type:
         issues = issues.filter(issue_type=issue_type)
-
     if status_filter:
         issues = issues.filter(status=status_filter)
 
@@ -108,14 +100,9 @@ def status_view(request):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="complaints.pdf"'
 
-        doc = SimpleDocTemplate(
-            response,
-            pagesize=A4,
-            rightMargin=1.2 * cm,
-            leftMargin=1.2 * cm,
-            topMargin=1.5 * cm,
-            bottomMargin=1.5 * cm
-        )
+        doc = SimpleDocTemplate(response, pagesize=A4,
+                                rightMargin=1.2 * cm, leftMargin=1.2 * cm,
+                                topMargin=1.5 * cm, bottomMargin=1.5 * cm)
         styles = getSampleStyleSheet()
         wrap_style = ParagraphStyle(name='WrapStyle', fontSize=8, leading=10)
         elements = []
@@ -130,7 +117,7 @@ def status_view(request):
             data.append([
                 issue.get_issue_type_display(),
                 Paragraph(issue.description, wrap_style),
-                issue.get_status_display() if hasattr(issue, 'get_status_display') else issue.status,
+                issue.get_status_display(),
                 issue.created_at.strftime('%Y-%m-%d %H:%M'),
                 str(issue.latitude) if issue.latitude else '-',
                 str(issue.longitude) if issue.longitude else '-',
