@@ -1,11 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-
+from django.core.validators import RegexValidator
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, id_number, password=None, **extra_fields):
         if not id_number:
             raise ValueError('The ID number must be set')
+        # Normalize ID number if needed (strip spaces etc)
+        id_number = id_number.strip()
         user = self.model(id_number=id_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -25,12 +27,17 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = None
-    id_number = models.CharField(max_length=13, unique=True)
+
+    id_number = models.CharField(
+        max_length=13,
+        unique=True,
+        validators=[RegexValidator(r'^\d{13}$', 'ID number must be 13 digits')]
+    )
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
-    email = models.EmailField(blank=True)
-    phone_number = models.CharField(max_length=10, blank=True)
-    address = models.TextField(blank=True)
+    email = models.EmailField(blank=True, null=True)
+    phone_number = models.CharField(max_length=10, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
