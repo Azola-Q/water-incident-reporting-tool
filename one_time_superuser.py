@@ -1,14 +1,12 @@
+from django.contrib.auth import get_user_model
 import os
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "water_delivery.settings")
 django.setup()
 
-from django.contrib.auth import get_user_model
-
 User = get_user_model()
 
-# Prevent duplicate superuser creation
 if not User.objects.filter(id_number="0000000000000").exists():
     User.objects.create_superuser(
         id_number="0000000000000",
@@ -17,9 +15,7 @@ if not User.objects.filter(id_number="0000000000000").exists():
         first_name="Admin",
         last_name="User",
         phone_number="0123456789",
-        address="Admin Office",
-        is_staff=True,
-        is_superuser=True
+        address="Admin Office"
     )
     print("✅ Superuser created")
 else:
