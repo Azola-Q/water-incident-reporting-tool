@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Use a unique ID number instead of "username"
+# Use a valid and unique ID number
 if not User.objects.filter(id_number="0000000000000").exists():
     User.objects.create_superuser(
         id_number="0000000000000",
@@ -17,9 +17,9 @@ if not User.objects.filter(id_number="0000000000000").exists():
         first_name="Admin",
         last_name="User",
         phone_number="0123456789",
+        address="Admin Office",
         is_staff=True,
-        is_superuser=True,
-        is_admin=True
+        is_superuser=True
     )
     print("✅ Superuser created")
 else:
