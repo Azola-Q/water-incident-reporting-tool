@@ -9,9 +9,11 @@ class IDNumberAuthBackend(ModelBackend):
     ID number (stored in the 'id_number' field) instead of username.
     """
 
-    def authenticate(self, request, username=None, password=None, **kwargs):
+    def authenticate(self, request, id_number=None, password=None, **kwargs):
+        if id_number is None:
+            id_number = kwargs.get('username')  # fallback if called with username param
         try:
-            user = User.objects.get(id_number=username)
+            user = User.objects.get(id_number=id_number)
         except User.DoesNotExist:
             return None
 
